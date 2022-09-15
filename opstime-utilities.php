@@ -19,6 +19,8 @@ require( INCLUDE_PATH . "disable_comments.php" );
 require( INCLUDE_PATH . "cron_jobs.php" );
 require( INCLUDE_PATH . "user_roles.php" );
 require( INCLUDE_PATH . "edizione_pdf.php" );
+require( INCLUDE_PATH . "edizione.php" );
+require( INCLUDE_PATH . "others.php" );
 
 class OPsTimeUtilities {
     private $disable_functions;
@@ -26,6 +28,8 @@ class OPsTimeUtilities {
     private $cron_jobs;
     private $user_roles;
     private $edizione_pdf;
+    private $edizione;
+    private $others;
 
     function __construct()
     {
@@ -34,6 +38,8 @@ class OPsTimeUtilities {
         $this->cron_jobs = new OPTU_Cron_Jobs();
         $this->user_roles = new OPTU_User_Roles();
         $this->edizione_pdf = new OPTU_Edizione_PDF();
+        $this->edizione = new OPTU_Edizione();
+        $this->others = new OPTU_Others();
     }
 }
 

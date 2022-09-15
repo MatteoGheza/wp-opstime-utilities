@@ -1,7 +1,7 @@
 /**
  * Load media uploader on pages with our custom metabox
  */
- jQuery(document).ready(function($){
+jQuery(document).ready(function($){
 
 	'use strict';
 
