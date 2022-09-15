@@ -1,50 +1,25 @@
 <?php
 class OPTU_Disable_Functions {
     function __construct() {
-        add_action( 'admin_head' , [$this, 'admin_head'] );
-        add_action('wp_dashboard_setup', [$this, 'remove_dashboard_widgets'] );
-        add_action( 'wp_before_admin_bar_render', [$this, 'remove_admin_bar_menus'] );
+        add_filter('manage_posts_columns', [$this, 'posts_columns'], 1 );
+        add_action('init', [$this, 'disable_tags'], 1 );
         add_action('admin_init', [$this, 'trim_admin_menu'] );
         add_action('init', [$this, 'disable_emojis'] );
+        add_action( 'admin_head' , [$this, 'admin_head'] );
+        /*
+        add_action('wp_dashboard_setup', [$this, 'remove_dashboard_widgets'] );
+        add_action( 'wp_before_admin_bar_render', [$this, 'remove_admin_bar_menus'] );
+        */
     }
 
-    function admin_head() {
-        remove_meta_box("aioseo-settings", ["qr", "post", "edizione_pdf"], "normal");
-        remove_action("post_submitbox_misc_actions", [ aioseo()->admin, 'addPublishScore' ]);
-    
-        remove_action("admin_bar_menu", [ aioseo()->admin, 'adminBarMenu' ], 9);
-        remove_action("admin_menu", [ aioseo()->admin, 'addMenu' ], 9);
-        remove_action("admin_menu", [ aioseo()->admin, 'hideScheduledActionsMenu' ], 9);
-        remove_action("admin_init", [ aioseo()->admin, 'addPluginScripts' ], 9);
-        remove_action("admin_footer", [ aioseo()->admin, 'addAioseoModalPortal' ], 9);
-        remove_action("admin_enqueue_scripts", [ aioseo()->admin, 'enqueueAioseoModalPortal' ], 9);
-    
-        remove_action( 'wp_dashboard_setup', [ aioseo()->dashboard, 'addDashboardWidgets' ], 9 );
+    function posts_columns($columns) {
+        do_action( 'qm/debug', $columns );
+        unset($columns["tags"]);
+        return $columns;
     }
 
-    function remove_dashboard_widgets() {
-        global $wp_meta_boxes;
-        unset($wp_meta_boxes['dashboard']['normal']['core']['aioseo-overview']);
-        unset($wp_meta_boxes['dashboard']['normal']['high']['aioseo-seo-setup']);
-    }
-
-    function remove_admin_bar_menus() {
-        global $wp_admin_bar;
-        ((object) $wp_admin_bar)->remove_node("aioseo");
-        ((object) $wp_admin_bar)->remove_node("aioseo-main");
-        ((object) $wp_admin_bar)->remove_node("aioseo-notifications");
-        ((object) $wp_admin_bar)->remove_node("aioseo-settings");
-        ((object) $wp_admin_bar)->remove_node("aioseo-search-appearance");
-        ((object) $wp_admin_bar)->remove_node("aioseo-social-networks");
-        ((object) $wp_admin_bar)->remove_node("aioseo-sitemaps");
-        ((object) $wp_admin_bar)->remove_node("aioseo-link-assistant");
-        ((object) $wp_admin_bar)->remove_node("aioseo-redirects");
-        ((object) $wp_admin_bar)->remove_node("aioseo-local-seo");
-        ((object) $wp_admin_bar)->remove_node("aioseo-seo-analysis");
-        ((object) $wp_admin_bar)->remove_node("aioseo-tools");
-        ((object) $wp_admin_bar)->remove_node("aioseo-feature-manager");
-        ((object) $wp_admin_bar)->remove_node("aioseo-about");
-        ((object) $wp_admin_bar)->remove_node("aioseo-pro-upgrade");
+    function disable_tags() {
+        register_taxonomy('post_tag', []);
     }
 
     function trim_admin_menu()
@@ -101,4 +76,52 @@ class OPTU_Disable_Functions {
             return array();
         }
     }
+
+    function admin_head() {
+        remove_meta_box("xmlsf_section", ["qrcode", "post", "edizione_pdf"], "side");
+        remove_meta_box("heateor_ogmt_meta", ["qrcode", "post", "page", "media", "edizione_pdf"], "advanced");
+
+        /*
+        remove_meta_box("aioseo-settings", ["qr", "post", "edizione_pdf"], "normal");
+        remove_action("post_submitbox_misc_actions", [ aioseo()->admin, 'addPublishScore' ]);
+
+        remove_action("init", [ aioseo()->admin, 'addPostColumnsAjax' ]);
+    
+        remove_action("admin_bar_menu", [ aioseo()->admin, 'adminBarMenu' ], 9);
+        remove_action("admin_menu", [ aioseo()->admin, 'addMenu' ], 9);
+        remove_action("admin_menu", [ aioseo()->admin, 'hideScheduledActionsMenu' ], 9);
+        remove_action("admin_init", [ aioseo()->admin, 'addPluginScripts' ], 9);
+        remove_action("admin_footer", [ aioseo()->admin, 'addAioseoModalPortal' ], 9);
+        remove_action("admin_enqueue_scripts", [ aioseo()->admin, 'enqueueAioseoModalPortal' ], 9);
+    
+        remove_action( 'wp_dashboard_setup', [ aioseo()->dashboard, 'addDashboardWidgets' ], 9 );
+        */
+    }
+
+    /*
+    function remove_dashboard_widgets() {
+        global $wp_meta_boxes;
+        unset($wp_meta_boxes['dashboard']['normal']['core']['aioseo-overview']);
+        unset($wp_meta_boxes['dashboard']['normal']['high']['aioseo-seo-setup']);
+    }
+
+    function remove_admin_bar_menus() {
+        global $wp_admin_bar;
+        ((object) $wp_admin_bar)->remove_node("aioseo");
+        ((object) $wp_admin_bar)->remove_node("aioseo-main");
+        ((object) $wp_admin_bar)->remove_node("aioseo-notifications");
+        ((object) $wp_admin_bar)->remove_node("aioseo-settings");
+        ((object) $wp_admin_bar)->remove_node("aioseo-search-appearance");
+        ((object) $wp_admin_bar)->remove_node("aioseo-social-networks");
+        ((object) $wp_admin_bar)->remove_node("aioseo-sitemaps");
+        ((object) $wp_admin_bar)->remove_node("aioseo-link-assistant");
+        ((object) $wp_admin_bar)->remove_node("aioseo-redirects");
+        ((object) $wp_admin_bar)->remove_node("aioseo-local-seo");
+        ((object) $wp_admin_bar)->remove_node("aioseo-seo-analysis");
+        ((object) $wp_admin_bar)->remove_node("aioseo-tools");
+        ((object) $wp_admin_bar)->remove_node("aioseo-feature-manager");
+        ((object) $wp_admin_bar)->remove_node("aioseo-about");
+        ((object) $wp_admin_bar)->remove_node("aioseo-pro-upgrade");
+    }
+    */
 }
