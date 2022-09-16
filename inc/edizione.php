@@ -10,6 +10,7 @@ class OPTU_Edizione {
         add_action( 'admin_enqueue_scripts', [$this, 'load_admin_scripts'], 10, 1 );
         add_action( 'created_edizione', [$this, 'save_term_fields'] );
         add_action( 'edited_edizione', [$this, 'save_term_fields'] );
+        add_action( 'restrict_manage_posts', [$this, 'filter_post_by_edizione'], 10, 2 );
     }
 
     function register_taxonomy() {
@@ -124,5 +125,32 @@ class OPTU_Edizione {
             'edizione_publication_date',
             sanitize_text_field( $_POST[ 'publication_date' ] )
         );        
+    }
+    
+    function filter_post_by_edizione( $post_type, $which ) {
+        //Based on https://generatewp.com/filtering-posts-by-taxonomies-in-the-dashboard/
+
+        if ( $post_type !== 'post' ) {
+            return;
+        }
+
+        $taxonomy_slug = "edizione";
+
+		// Retrieve taxonomy terms
+		$terms = get_terms( $taxonomy_slug );
+
+		// Display filter HTML
+		echo "<select name='{$taxonomy_slug}' id='{$taxonomy_slug}' class='postform'>";
+		echo '<option value="">Mostra tutte le Edizioni</option>';
+		foreach ( $terms as $term ) {
+			printf(
+				'<option value="%1$s" %2$s>%3$s (%4$s)</option>',
+				$term->slug,
+				( ( isset( $_GET[$taxonomy_slug] ) && ( $_GET[$taxonomy_slug] == $term->slug ) ) ? ' selected="selected"' : '' ),
+				$term->name,
+				$term->count
+			);
+		}
+		echo '</select>';
     }
 }
