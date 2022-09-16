@@ -1,5 +1,5 @@
 <?php
-class OPTU_Cron_Jobs {
+class OPTU_Static_Site_Cron {
     function __construct()
     {
         add_action('run_static_site_archive_generation_cron', [$this, 'run_static_site_archive_generation_cron'] );
