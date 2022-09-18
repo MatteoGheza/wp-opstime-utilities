@@ -1,0 +1,19 @@
+{
+  "name": "edizione_taxonomy_selector",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "dev": "wp-scripts start"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "24.1.0"
+  },
+  "dependencies": {
+    "@wordpress/components": "^21.0.0",
+    "@wordpress/core-data": "^5.0.0",
+    "@wordpress/data": "^7.1.0",
+    "lodash": "^4.17.21"
+  }
+}

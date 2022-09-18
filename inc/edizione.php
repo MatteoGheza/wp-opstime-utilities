@@ -8,6 +8,7 @@ class OPTU_Edizione {
         add_action( 'edizione_add_form_fields', [$this, 'add_custom_fields'] );
         add_action( 'edizione_edit_form_fields', [$this, 'edit_term_fields'], 10, 2 );
         add_action( 'admin_enqueue_scripts', [$this, 'load_admin_scripts'], 10, 1 );
+        add_action( 'enqueue_block_editor_assets', [$this, 'load_gutenberg_scripts'] );
         add_action( 'created_edizione', [$this, 'save_term_fields'] );
         add_action( 'edited_edizione', [$this, 'save_term_fields'] );
         add_action( 'restrict_manage_posts', [$this, 'filter_post_by_edizione'], 10, 2 );
@@ -117,6 +118,17 @@ class OPTU_Edizione {
             ));
             wp_enqueue_script('edizione-custom-fields');
         }
+    }
+
+    function load_gutenberg_scripts() {
+        $asset_file = include( plugin_dir_path( __FILE__ ) . 'edizione_taxonomy_selector/build/index.asset.php');
+        wp_register_script(
+            'edizione-taxonomy-selector',
+            plugins_url('edizione_taxonomy_selector/build/index.js', __FILE__),
+            $asset_file['dependencies'],
+            $asset_file['version']
+        );
+        wp_enqueue_script('edizione-taxonomy-selector');
     }
 
     function save_term_fields( $term_id ) {
