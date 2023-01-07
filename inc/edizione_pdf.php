@@ -108,8 +108,9 @@ class OPTU_Edizione_PDF {
     //Intercept the post before it actually renders so we can redirect if it's a PDF
     function redirect_pdf_post_type_to_media() {
 	    global $post;
-	    if(!is_admin() && isset($post->post_type) && $post->post_type == 'edizione_pdf') {
+	    if(!is_post_type_archive() && isset($post->post_type) && $post->post_type == 'edizione_pdf') {
             $url = urldecode(get_post_meta($post->ID, 'edizione_pdf_media_id', true));
+            //do_action( 'qm/debug', get_post_meta($post->ID) );
             if(
                 (!$url || is_null($url) || empty($url)) ||
                 parse_url($url, PHP_URL_HOST) !== parse_url(get_site_url(), PHP_URL_HOST)
@@ -148,9 +149,9 @@ class OPTU_Edizione_PDF {
                     </label><br>
                     <a class="metabox-form-margin" id="edizione_pdf_media_url" href="#" target="_blank">
                     </a>
-                    <input type="hidden" name="edizione_pdf_media" id="edizione_pdf_media" value="<?php echo esc_attr($saved); ?>">
+                    <input type="hidden" name="edizione_pdf_media" id="edizione_pdf_media_input" value="<?php echo esc_attr($saved); ?>">
                     <button type="button" class="button metabox-form-margin" id="events_video_upload_btn"
-                     data-media-uploader-target="#edizione_pdf_media" data-media-upload-notice="#edizione_pdf_upload_notice" data-media-filename-label="#edizione_pdf_media_filename" data-media-url="#edizione_pdf_media_url">Carica PDF</button>
+                     data-media-uploader-target="#edizione_pdf_media_input" data-media-upload-notice="#edizione_pdf_upload_notice" data-media-filename-label="#edizione_pdf_media_filename" data-media-url="#edizione_pdf_media_url">Carica PDF</button>
                 </div>
         </fieldset>
 <?php
@@ -171,7 +172,7 @@ class OPTU_Edizione_PDF {
       
         /* Get the meta value of the custom field key. */
         $meta_value = get_post_meta( $post_id, $meta_key, true );
-      
+
         /* If a new meta value was added and there was no previous value, add it. */
         if ( $new_meta_value && empty($meta_value) )
           add_post_meta( $post_id, $meta_key, $new_meta_value, true );

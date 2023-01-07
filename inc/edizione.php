@@ -12,6 +12,8 @@ class OPTU_Edizione {
         add_action( 'created_edizione', [$this, 'save_term_fields'] );
         add_action( 'edited_edizione', [$this, 'save_term_fields'] );
         add_action( 'restrict_manage_posts', [$this, 'filter_post_by_edizione'], 10, 2 );
+        add_action( 'quick_edit_custom_box', [$this, 'edit_custom_box'], 10, 3);
+        add_action( 'save_post_post', [$this, 'quick_edit_save'] );
     }
 
     function register_taxonomy() {
@@ -54,6 +56,7 @@ class OPTU_Edizione {
             'show_ui'                    => true,
             'show_admin_column'          => true,
             'show_in_nav_menus'          => true,
+            'show_in_quick_edit'         => false,
             'show_tagcloud'              => false,
             'query_var'                  => 'edizione',
             'rewrite'                    => $rewrite,
@@ -76,7 +79,6 @@ class OPTU_Edizione {
 	}
 
     function edizione_columns($columns) {
-        do_action( 'qm/debug', $columns );
         return $columns;
     }
 
@@ -149,7 +151,7 @@ class OPTU_Edizione {
         $taxonomy_slug = "edizione";
 
 		// Retrieve taxonomy terms
-		$terms = get_terms( $taxonomy_slug );
+		$terms = get_terms( array( 'taxonomy' => $taxonomy_slug, 'hide_empty' => false ) );
 
 		// Display filter HTML
 		echo "<select name='{$taxonomy_slug}' id='{$taxonomy_slug}' class='postform'>";
@@ -164,5 +166,59 @@ class OPTU_Edizione {
 			);
 		}
 		echo '</select>';
+    }
+
+    function remove_manage_post_column( $columns ) {
+        unset($columns['taxonomy-edizione']);
+        return $columns;
+    }
+
+    function edit_custom_box( $column_name, $screen, $name ) {
+        //Based on https://halfelf.org/2016/taxonomies-dropdowns-quick-edit/
+        if($screen != 'post' || $column_name != 'taxonomy-edizione') {
+            return false;
+        }
+
+        $terms = get_terms( array( 'taxonomy' => 'edizione', 'hide_empty' => false ) );
+    ?>
+        <fieldset>
+            <div id="edizione-selector" class="inline-edit-col">
+                <label>
+                    <span class="title">Edizione</span>
+                    <span class="input-text-wrap">
+                        <select name='terms_edizione' id='terms_edizione'>
+                            <option class='edizione-option' value=''>Nessuna edizione</option>
+                            <?php
+                            foreach ($terms as $term) {
+                                echo "<option class='edizione-option' value='{$term->name}'>{$term->name}</option>\n";
+                            }
+                            ?>
+                        </select>
+                    </span>
+                </label>
+            </div>
+        </fieldset>
+    <?php
+    }
+
+    function quick_edit_save($post_id) {
+        //Based on https://halfelf.org/2016/taxonomies-dropdowns-quick-edit/
+
+        do_action("qm/debug", $_POST);
+
+        // Criteria for not saving: Auto-saves, not post_type_characters, can't edit
+        if ( ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) || ( 'post_type_characters' != $_POST['post_type'] ) || !current_user_can( 'edit_page', $post_id ) ) {
+            return $post_id;
+        }
+     
+        $post = get_post($post_id);
+
+        if ( isset($_POST['terms_edizione']) && ($post->post_type != 'revision') ) {
+            $edizione_term = esc_attr($_POST['terms_edizione']);
+            $term = term_exists( $edizione_term, 'edizione');
+            if ( $term !== 0 && $term !== null) {
+                wp_set_object_terms( $post_id, $edizione_term, 'edizione' );
+            }
+        }
     }
 }

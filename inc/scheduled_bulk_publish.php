@@ -18,7 +18,7 @@ class OPTU_Scheduled_Bulk_Publish {
             'public'                    => false,
             'show_in_admin_all_list'    => true,
             'show_in_admin_status_list' => true,
-            'exclude_from_search'       => true,
+            'exclude_from_search'       => false,
         );
         register_post_status( 'ready', $args );
     }
