@@ -72,12 +72,18 @@ class OPTU_Edizione {
 
     }
 
-    public function render_edizione_list()
+    static public function render_edizione_list()
     {
         $terms = get_terms( array(
             'taxonomy' => 'edizione',
             'hide_empty' => false,
         ) );
+        //do_action("qm/debug", $terms);
+
+        usort($terms, function($a, $b) {
+            return get_term_meta( $b->term_id, 'edizione_publication_date', true ) - get_term_meta( $a->term_id, 'edizione_publication_date', true );
+        });
+        //do_action("qm/debug", $terms);
 
         $list_elements = "";
         foreach($terms as $term) {
