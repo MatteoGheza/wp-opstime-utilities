@@ -2,9 +2,9 @@
 class OPTU_Edizione {
     function __construct()
     {
-        add_action( 'init', [$this, 'register_taxonomy'], 0);
+        add_action( 'init', [$this, 'register_taxonomy'], PHP_INT_MAX);
         add_action( 'admin_head', [$this, 'admin_css'] );
-        add_filter( 'manage_edit-edizione_columns', [$this, 'edizione_columns'], 1 );
+        //add_filter( 'manage_edit-edizione_columns', [$this, 'edizione_columns'], 1 );
         add_action( 'edizione_add_form_fields', [$this, 'add_custom_fields'] );
         add_action( 'edizione_edit_form_fields', [$this, 'edit_term_fields'], 10, 2 );
         add_action( 'admin_enqueue_scripts', [$this, 'load_admin_scripts'], 10, 1 );
@@ -12,8 +12,8 @@ class OPTU_Edizione {
         add_action( 'created_edizione', [$this, 'save_term_fields'] );
         add_action( 'edited_edizione', [$this, 'save_term_fields'] );
         add_action( 'restrict_manage_posts', [$this, 'filter_post_by_edizione'], 10, 2 );
-        add_action( 'quick_edit_custom_box', [$this, 'edit_custom_box'], 10, 3);
-        add_action( 'save_post_post', [$this, 'quick_edit_save'] );
+        //add_action( 'quick_edit_custom_box', [$this, 'edit_custom_box'], 10, 3);
+        //add_action( 'save_post_post', [$this, 'quick_edit_save'] );
     }
 
     function register_taxonomy() {
@@ -56,7 +56,7 @@ class OPTU_Edizione {
             'show_ui'                    => true,
             'show_admin_column'          => true,
             'show_in_nav_menus'          => true,
-            'show_in_quick_edit'         => false,
+            'show_in_quick_edit'         => true,
             'show_tagcloud'              => false,
             'query_var'                  => 'edizione',
             'rewrite'                    => $rewrite,
@@ -65,7 +65,43 @@ class OPTU_Edizione {
             'rest_base'                  => 'edizioni',
         );
         register_taxonomy( 'edizione', array( 'post' ), $args );
-    
+
+        register_block_type(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'edizione_list' . DIRECTORY_SEPARATOR . 'build' . DIRECTORY_SEPARATOR . 'block.json', array(
+            'render_callback' => [OPTU_Edizione::class, 'render_edizione_list']
+        ));
+
+    }
+
+    public function render_edizione_list()
+    {
+        $terms = get_terms( array(
+            'taxonomy' => 'edizione',
+            'hide_empty' => false,
+        ) );
+
+        $list_elements = "";
+        foreach($terms as $term) {
+            $name = $term->name;
+            $link = get_term_link($term->term_id);
+
+            $list_elements .= <<<HTML
+            <li class="list-group-item"><a href="$link">$name</a></li>
+HTML;
+        }
+
+        return <<<HTML
+        <style>
+        #edizioni_list {
+	        font-size: 1.5em;
+        }
+        #edizioni_list .list-group-item:first-child {
+            border-top: initial;
+        }
+        </style>
+        <ul id="edizioni_list" class="list-group list-group-flush">
+            $list_elements
+        </ul>
+HTML;
     }
 
     public function admin_css()
@@ -78,9 +114,11 @@ class OPTU_Edizione {
 		</style>';
 	}
 
+    /*
     function edizione_columns($columns) {
         return $columns;
     }
+    */
 
     function add_custom_fields( $taxonomy ) {
     ?>
@@ -168,11 +206,15 @@ class OPTU_Edizione {
 		echo '</select>';
     }
 
+    /*
     function remove_manage_post_column( $columns ) {
         unset($columns['taxonomy-edizione']);
         return $columns;
     }
+    */
 
+    /*
+    //Not working
     function edit_custom_box( $column_name, $screen, $name ) {
         //Based on https://halfelf.org/2016/taxonomies-dropdowns-quick-edit/
         if($screen != 'post' || $column_name != 'taxonomy-edizione') {
@@ -221,4 +263,5 @@ class OPTU_Edizione {
             }
         }
     }
+    */
 }

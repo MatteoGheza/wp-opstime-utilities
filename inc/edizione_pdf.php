@@ -8,6 +8,7 @@ class OPTU_Edizione_PDF {
         add_action('admin_enqueue_scripts', [$this, 'load_admin_scripts'], 10, 1);
         add_action("add_meta_boxes", [$this, "register_meta_box"]);
         add_action( 'save_post', [$this, 'save_post']);
+        add_shortcode( 'edizioni_pdf_list', [$this, 'shortcode_list'] );
     }
 
     function register_post_type() {
@@ -103,6 +104,73 @@ class OPTU_Edizione_PDF {
                 $role->add_cap($cap);
             }
         }
+    }
+
+    function shortcode_list()
+    {
+        global $wp_query;
+
+        //This shortcode is used both in pages and in the archive page in theme template code
+        if(get_query_var( 'post_type', false )){
+            $loop = $wp_query;
+        } else {
+            $loop = new WP_Query(array(  
+                'post_type' => 'edizione_pdf',
+                'post_status' => 'publish'
+            ));
+        }
+
+        //do_action("qm/debug", $loop);
+
+        $table_rows = "";
+
+        //Il mese dell'edizione è il titolo senza l'anno
+        //Questo permette di avere titoli più complessi e di aggiungere più mesi ad una sola edizione
+        while ($loop->have_posts()) {
+            $loop->the_post();
+            $year = get_the_date("Y");
+            $title = trim(str_replace($year, "", get_the_title()));
+            $link = get_permalink();
+            $table_rows .= <<<HTML
+            <tr>
+                <th scope="row">$year</th>
+                <td>$title</td>
+                <td>
+                    <a href="$link"><i class="table-btn-icon fa fa-download"></i></a>
+                </td>
+            </tr>
+HTML;
+        }
+
+        wp_reset_postdata();
+        
+        return <<<HTML
+        <style>
+        #edizioni_pdf_list {
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            max-width: initial;
+        }
+        @media (min-width: 1400) {
+            #edizioni_pdf_list {
+                max-width: 85%;
+            }
+        }
+        </style>
+        <table class="table" id="edizioni_pdf_list">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Anno</th>
+                    <th scope="col">Mese</th>
+                    <th scope="col">Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                $table_rows
+            </tbody>
+        </table>
+HTML;
     }
 
     //Intercept the post before it actually renders so we can redirect if it's a PDF
