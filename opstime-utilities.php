@@ -3,7 +3,7 @@
 Plugin Name: OPsTimeUtilities
 Description: Plugin con configurazioni e funzioni utilizzate dall'OPs Time
 Author: Matteo Gheza <matteo.gheza07@gmail.com>
-Version: 1.0.0
+Version: 3.0.0
 Requires PHP: 5.3
 */
 
