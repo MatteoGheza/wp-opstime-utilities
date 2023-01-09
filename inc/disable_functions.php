@@ -6,10 +6,8 @@ class OPTU_Disable_Functions {
         add_action('admin_init', [$this, 'trim_admin_menu'] );
         add_action('init', [$this, 'disable_emojis'] );
         add_action( 'admin_head' , [$this, 'admin_head'] );
-        /*
-        add_action('wp_dashboard_setup', [$this, 'remove_dashboard_widgets'] );
-        add_action( 'wp_before_admin_bar_render', [$this, 'remove_admin_bar_menus'] );
-        */
+        add_action('wp_dashboard_setup', [$this, 'remove_dashboard_widgets'], PHP_INT_MAX );
+        //add_action( 'wp_before_admin_bar_render', [$this, 'remove_admin_bar_menus'] );
     }
 
     function posts_columns($columns) {
@@ -98,15 +96,20 @@ class OPTU_Disable_Functions {
         */
     }
 
-    /*
     function remove_dashboard_widgets() {
         global $wp_meta_boxes;
-        unset($wp_meta_boxes['dashboard']['normal']['core']['aioseo-overview']);
-        unset($wp_meta_boxes['dashboard']['normal']['high']['aioseo-seo-setup']);
+        //do_action("qm/debug", json_encode($wp_meta_boxes));
+        if (!current_user_can('administrator')) {
+            unset($wp_meta_boxes['dashboard']['normal']['core']['dashboard_rediscache']);
+        }
+        //unset($wp_meta_boxes['dashboard']['normal']['core']['aioseo-overview']);
+        //unset($wp_meta_boxes['dashboard']['normal']['high']['aioseo-seo-setup']);
     }
 
+    /*
     function remove_admin_bar_menus() {
         global $wp_admin_bar;
+        //do_action("qm/debug", $wp_admin_bar);
         ((object) $wp_admin_bar)->remove_node("aioseo");
         ((object) $wp_admin_bar)->remove_node("aioseo-main");
         ((object) $wp_admin_bar)->remove_node("aioseo-notifications");
