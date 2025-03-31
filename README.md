@@ -1,3 +1,4 @@
 # OPsTimeUtilities
 
-## Plugin con configurazioni e funzioni utilizzate dall'OPs Time
+## WP Plugin used to manage OP's Time _(discountinued school newspaper)_
+If you want to see a site mirror, go to https://opstimegiornalinoscolastico.github.io/
